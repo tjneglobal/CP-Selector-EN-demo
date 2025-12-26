@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MMO / DSA Anode Pre-Selection Tool</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f9;
+      color: #222;
+    }
+
+    header {
+      background: #0b3c5d;
+      color: #ffffff;
+      padding: 24px 40px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: normal;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    main {
+      max-width: 980px;
+      margin: 32px auto;
+      background: #ffffff;
+      padding: 36px;
+      border-radius: 6px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+
+    section {
+      margin-bottom: 36px;
+    }
+
+    section h2 {
+      font-size: 18px;
+      margin-bottom: 16px;
+      border-left: 4px solid #0b3c5d;
+      padding-left: 12px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .note {
+      font-size: 13px;
+      color: #555;
+      margin-top: 6px;
+    }
+
+    button {
+      background: #0b3c5d;
+      color: #ffffff;
+      padding: 14px 30px;
+      font-size: 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #094066;
+    }
+
+    .result {
+      background: #f0f4f8;
+      padding: 24px;
+      border-radius: 4px;
+      line-height: 1.6;
+    }
+
+    .warning {
+      color: #a33;
+      font-weight: bold;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: #777;
+      margin: 40px 0 20px;
+    }
+
+    @media (max-width: 700px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>MMO / DSA Anode Pre-Selection Tool</h1>
+  <p>Engineering-oriented estimator for cathodic protection & electrochemical applications</p>
+</header>
+
+<main>
+
+  <section>
+    <h2>1. Design Parameters</h2>
+
+    <div class="grid">
+      <div>
+        <label>Design Current (A)</label>
+        <input type="number" id="current" placeholder="e.g. 40">
+        <div class="note">Total output current required by the CP system</div>
+      </div>
+
+      <div>
+        <label>Environmental Resistivity (Ω·cm)</label>
+        <input type="number" id="resistivity" placeholder="e.g. 3000">
+        <div class="note">Soil or water resistivity at installation site</div>
+      </div>
+
+      <div>
+        <label>Protected Structure Area (m²)</label>
+        <input type="number" id="area" placeholder="e.g. 1200">
+        <div class="note">Approximate exposed surface area</div>
+      </div>
+
+      <div>
+        <label>Application Type</label>
+        <select id="application">
+          <option value="">-- Select application --</option>
+          <option>Pipeline cathodic protection</option>
+          <option>Tank bottom protection</option>
+          <option>Marine structure</option>
+          <option>Water treatment / electrolysis</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>2. Pre-Selection Result</h2>
+
+    <button onclick="runSelection()">Run Pre-Selection</button>
+
+    <div class="result" id="result" style="margin-top:24px;">
+      Please enter project parameters and click “Run Pre-Selection”.
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  © TJNE — MMO / DSA Anode Technology  
+  <br>
+  <span style="opacity:0.7;">This tool provides preliminary engineering estimation only.</span>
+</footer>
+
+<script>
+  function runSelection() {
+    const current = Number(document.getElementById("current").value);
+    const resistivity = Number(document.getElementById("resistivity").value);
+    const area = Number(document.getElementById("area").value);
+    const application = document.getElementById("application").value;
+
+    if (!current || !resistivity || !area || !application) {
+      document.getElementById("result").innerHTML =
+        "<span class='warning'>⚠ Please complete all input fields.</span>";
+      return;
+    }
+
+    let anodeType = "";
+    let layout = "";
+
+    if (resistivity > 5000) {
+      anodeType = "MMO Tubular Anode";
+      layout = "Deep groundbed or coke-backfilled configuration recommended.";
+    } else if (resistivity > 2000) {
+      anodeType = "MMO Ribbon or Mesh Anode";
+      layout = "Distributed linear or surface installation.";
+    } else {
+      anodeType = "MMO Plate / Linear Anode";
+      layout = "Shallow groundbed or close-coupled layout.";
+    }
+
+    document.getElementById("result").innerHTML =
+      "<strong>Application:</strong> " + application + "<br><br>" +
+      "<strong>Estimated Anode Type:</strong> " + anodeType + "<br>" +
+      "<strong>Recommended Layout:</strong> " + layout + "<br><br>" +
+      "<em>This result is a preliminary engineering reference and does not replace final CP design.</em>";
+  }
+</script>
+
+</body>
+</html>
