@@ -36,4 +36,229 @@ h1{margin:0;font-size:20px}
   padding:18px;
   margin-top:16px
 }
-.options{display:grid;grid-template-columns
+.options{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px;
+  cursor:pointer
+}
+.opt:hover{background:rgba(255,255,255,.08)}
+.opt.active{outline:2px solid var(--brand)}
+.btn{
+  background:linear-gradient(135deg,#7C5CFF,#18C2FF);
+  border:none;border-radius:12px;
+  padding:10px 14px;
+  color:#fff;
+  font-weight:700;
+  cursor:pointer
+}
+input,textarea{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:rgba(0,0,0,.35);
+  color:var(--text)
+}
+.hidden{display:none}
+ul{margin:8px 0 0 18px;color:var(--muted)}
+.footer{margin:40px 0 20px;text-align:center;color:var(--muted);font-size:12px}
+small{color:var(--muted)}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>Cathodic Protection Solution Selector</h1>
+    <div style="font-size:12px;color:var(--muted)">
+      MMO / DSA Anodes · Engineering-guided recommendation
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- STEP 1 -->
+<div class="card" id="s1">
+  <h3>1. Project Type</h3>
+  <div class="options">
+    <div class="opt" onclick="sel(this,'project','Buried Pipeline')">Buried Pipeline</div>
+    <div class="opt" onclick="sel(this,'project','Marine Structure / Jetty')">Marine Structure / Jetty</div>
+    <div class="opt" onclick="sel(this,'project','Storage Tank Bottom')">Storage Tank Bottom</div>
+    <div class="opt" onclick="sel(this,'project','Water Intake / Cooling System')">Water Intake / Cooling System</div>
+  </div>
+  <br><button class="btn" onclick="go(2)">Continue</button>
+</div>
+
+<!-- STEP 2 -->
+<div class="card hidden" id="s2">
+  <h3>2. Environment & Design Life</h3>
+  <div class="options">
+    <div class="opt" onclick="sel(this,'env','Soil / Buried')">Soil / Buried</div>
+    <div class="opt" onclick="sel(this,'env','Seawater')">Seawater</div>
+    <div class="opt" onclick="sel(this,'env','Fresh Water')">Fresh Water</div>
+    <div class="opt" onclick="sel(this,'env','Concrete Structure')">Concrete Structure</div>
+  </div>
+  <br>
+  <div class="options">
+    <div class="opt" onclick="sel(this,'life','≥ 20 years')">Design life ≥ 20 years</div>
+    <div class="opt" onclick="sel(this,'life','10–20 years')">Design life 10–20 years</div>
+    <div class="opt" onclick="sel(this,'life','≤ 10 years')">Design life ≤ 10 years</div>
+  </div>
+  <br><button class="btn" onclick="go(3)">Continue</button>
+</div>
+
+<!-- STEP 3 -->
+<div class="card hidden" id="s3">
+  <h3>3. Optional Engineering Inputs</h3>
+  <small>If exact data is not available, you may leave fields blank.</small><br><br>
+
+  <label>Required Protection Current (A)</label>
+  <input type="number" id="current">
+
+  <br><br>
+  <label>Protected Surface Area (m²)</label>
+  <input type="number" id="area">
+
+  <br><br>
+  <label>Soil Resistivity (Ω·m)</label>
+  <input type="number" id="resist">
+
+  <br><br>
+  <label>Project Notes</label>
+  <textarea id="desc" rows="3"></textarea>
+
+  <br><br>
+  <button class="btn" onclick="calc()">View Recommendation</button>
+</div>
+
+<!-- RESULT -->
+<div class="card hidden" id="result">
+  <h3>Recommended Cathodic Protection Solution</h3>
+
+  <p><strong id="mainRec"></strong></p>
+
+  <p>Why this solution fits your project:</p>
+  <ul id="why"></ul>
+
+  <p>Alternative options:</p>
+  <ul id="alt"></ul>
+
+  <hr style="border-color:var(--line)">
+
+  <h4>Send Project Summary to TJNE</h4>
+
+  <label>Your Email (required)</label>
+  <input type="email" id="email" placeholder="your@email.com" required>
+
+  <br><br>
+  <label>Company (optional)</label>
+  <input type="text" id="company">
+
+  <br><br>
+  <label>Country (optional)</label>
+  <input type="text" id="country">
+
+  <br><br>
+  <button class="btn" onclick="sendToTJNE()">Send my project summary</button>
+
+  <br><br>
+  <small>Your information will be used only for preliminary engineering review.</small>
+
+  <br><br>
+  <button class="btn" onclick="location.reload()">Start Over</button>
+</div>
+
+</div>
+
+<div class="footer">© Xi’an Taijin New Energy Technology Co., Ltd. | TJNE</div>
+
+<script>
+const s={}
+function sel(el,k,v){
+  el.parentNode.querySelectorAll('.opt').forEach(o=>o.classList.remove('active'))
+  el.classList.add('active')
+  s[k]=v
+}
+function go(n){
+  document.querySelectorAll('.card').forEach(d=>d.classList.add('hidden'))
+  document.getElementById('s'+n).classList.remove('hidden')
+}
+function calc(){
+  document.querySelectorAll('.card').forEach(d=>d.classList.add('hidden'))
+  document.getElementById('result').classList.remove('hidden')
+
+  let rec = "MMO Canister Anode with Ir–Ta coating"
+  let why = [
+    "Suitable for long-term, continuous cathodic protection projects",
+    "Stable current output and predictable service life"
+  ]
+  let alt = [
+    "MMO Tubular Anode",
+    "MMO Ribbon Anode"
+  ]
+
+  document.getElementById('mainRec').innerText = rec
+  document.getElementById('why').innerHTML = why.map(i=>"<li>"+i+"</li>").join("")
+  document.getElementById('alt').innerHTML = alt.map(i=>"<li>"+i+"</li>").join("")
+}
+
+function sendToTJNE(){
+  const emailEl = document.getElementById('email')
+  if(!emailEl || !emailEl.value){
+    alert("Email is required.")
+    return
+  }
+
+  // 安全兜底（防止 undefined 报错）
+  const project = s.project || "Not specified"
+  const env     = s.env     || "Not specified"
+  const life    = s.life    || "Not specified"
+
+  const current = document.getElementById('current')?.value || "N/A"
+  const area    = document.getElementById('area')?.value || "N/A"
+  const resist  = document.getElementById('resist')?.value || "N/A"
+  const notes   = document.getElementById('desc')?.value || "N/A"
+
+  const company = document.getElementById('company')?.value || ""
+  const country = document.getElementById('country')?.value || ""
+
+  const summary =
+`Project Type: ${project}
+Environment: ${env}
+Design Life: ${life}
+
+Current (A): ${current}
+Area (m²): ${area}
+Resistivity (Ω·m): ${resist}
+
+Notes:
+${notes}`
+
+  const url =
+    "https://docs.google.com/forms/d/e/1FAIpQLSdUNFN2tdJOtUiMwAPCgoKNcjwNE9JjGmE9apiFiFhaZ_afrg/viewform?" +
+    "entry.2051557678=" + encodeURIComponent(emailEl.value) +
+    "&entry.841187286=" + encodeURIComponent(company) +
+    "&entry.247384298=" + encodeURIComponent(country) +
+    "&entry.122560274=" + encodeURIComponent(summary)
+
+  window.open(url, "_blank")
+}
+
+
+  const url =
+    "https://docs.google.com/forms/d/e/1FAIpQLSdUNFN2tdJOtUiMwAPCgoKNcjwNE9JjGmE9apiFiFhaZ_afrg/viewform?" +
+    "entry.2051557678=" + encodeURIComponent(email) +
+    "&entry.841187286=" + encodeURIComponent(document.getElementById('company').value || "") +
+    "&entry.247384298=" + encodeURIComponent(document.getElementById('country').value || "") +
+    "&entry.122560274=" + encodeURIComponent(summary)
+
+  window.open(url, "_blank")
+}
+</script>
+
+</body>
+</html>
